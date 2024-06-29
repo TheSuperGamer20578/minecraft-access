@@ -569,8 +569,8 @@ public class GroupGenerator {
             if (allSlotsHaveSameType) {
                 // Set group name to unique slot class name
                 // e.g. ModAbcSlot -> mod_abc_slot
-                groupName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, group.getFirst().slot.getClass().getSimpleName());
-                groupKey = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, group.getFirst().slot.getClass().getCanonicalName());
+                groupName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, group.get(0).slot.getClass().getSimpleName());
+                groupKey = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, group.get(group.size() - 1).slot.getClass().getCanonicalName());
                 // Don't use vanilla obfuscated class names
                 if (groupName.startsWith("class_")) {
                     groupKey = "unknown";
