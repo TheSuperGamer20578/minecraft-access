@@ -1,189 +1,169 @@
-# For each version, must run this workflow twice
-# with "pre-release: false" at first time (beta release),
-# then "pre-release: true" at second time (formal release)
-#
-# Generate Personal Access Token (PAT) in platforms,
-# set "MODRINTH_TOKEN" and "CURSEFORGE_TOKEN"
-# in GitHub repository settings -> Secrets and variables -> Actions -> Repository secrets
-name: Publish on GitHub, CurseForge, Modrinth
-
-# This release workflow can only be triggered manually
+name: Release
+run-name: "Release v${{ inputs.version }}"
 on:
   workflow_dispatch:
     inputs:
-      pre-release:
-        default: true
-        required: false
-        description: Pre Release (only create a pre-release GitHub release, not publish to CurseForge, Modrinth)
-        type: boolean
       version:
-        default: 'latest'
-        required: false
-        description: Version to be published (git tag like 'v1.5.2-1.20.4', DO use default value for pre-release the latest version)
-        type: string
-      note:
-        default: ''
-        required: false
-        description: Additional Release Note (will be printf to the head of release message, use "\n" to switch line)
-        type: string
+        required: true
+        description: Version
 
-env:
-  JAVA_VERSION: '21'
-  UPLOAD_PATH: upload
-  CHANGELOG_FILE_PATH: ./docs/changelog.md
-  MOD_COMPATIBILITY_INFO_FILE_PATH: ./docs/mod-compatibility.md
-  # Release body for GitHub release
-  CHANGELOG_TEMP_GITHUB: .changelog_github.md
-  # Release body for modrinth, curseforge
-  CHANGELOG_TEMP_PLATFORM: .changelog_platform.md
-  MODRINTH_ID: jGzXyfdm
-  CURSEFORGE_ID: 830055
+concurrency:
+  group: workflow-${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
-  test-and-build:
-    name: Test and Build
-    uses: ./.github/workflows/build.yml
-    with:
-      jdk-version: '21'
-      build-files-cache-key: ${{ github.run_id }}
-      version: ${{ inputs.version }}
-
-  publish:
-    name: Publish
-    needs: test-and-build
-    permissions:
-      # Assigning repo "write" permissions to this workflow
-      # ref: https://docs.github.com/en/rest/authentication/permissions-required-for-github-apps?apiVersion=2022-11-28#repository-permissions-for-contents
-      contents: write
+  prepare:
+    name: Prepare
     runs-on: ubuntu-latest
-    # ref: https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs
     outputs:
-      release-tag: ${{ steps.env.outputs.release-tag || inputs.version }}
+      changelog: ${{ steps.changelog.outputs.result }}
+    concurrency:
+      group: ref-${{ github.ref }}
+      cancel-in-progress: false
     steps:
-      # As long as we check out right commit at first,
-      # there is no need to modify steps below this checkout step
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.version == 'latest' && github.ref || inputs.version }}
-
-      - name: Restore Cached Mod Files
-        uses: actions/cache/restore@v4
+          fetch-depth: 0
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+      - name: Collate Changelog
+        id: changelog
+        uses: actions/github-script@v7
         with:
-          path: ${{ env.UPLOAD_PATH }}
-          key: ${{ github.run_id }}
-
-      # Get version information from gradle.properties and set them as environment variables
-      # MINECRAFT_VERSION: 1.20.4
-      # MOD_GAME_VERSION: 1.5.2+1.20.4
-      # MOD_VERSION: 1.5.2
-      # GIT_VERSION_TAG: v1.5.2-1.20.4 (v{mod version}-{minecraft version})
-      - name: Set Environment Variables
-        id: env
+          # language=javascript
+          script: |
+            const prerelease = context.payload.inputs.version.includes("-");
+            const prs = await github.rest.search.issuesAndPullRequests({
+                q: prerelease
+                    ? `repo:${context.payload.repository.full_name} is:open sort:created-asc -label:released -label:in-prerelease`
+                    : `repo:${context.payload.repository.full_name} is:open sort:created-asc -label:released`  // FIXME
+            });
+            const sections = {};
+            for (const pr of prs.data.items) {
+                if (!pr.body.includes("# Changelog")) {
+                    continue;
+                }
+                const changelog = pr.body.split("# Changelog")[1].trim();
+                let section = null;
+                for (const line of changelog.split("\n")) {
+                    if (!line.trim()) {
+                        continue;
+                    }
+                    if (line.startsWith("## ")) {
+                        section = line.substring(3).trim();
+                        if (sections[section] === undefined) {
+                            sections[section] = [];
+                        }
+                        continue;
+                    }
+                    sections[section].push(line.trim());
+                }
+            }
+            let changelog = "";
+            if (sections[null]) {
+                changelog += sections[null].join("\n");
+            }
+            for (const section in sections) {
+                if (section === null || sections[section].length === 0) {
+                    continue;
+                }
+                changelog += `\n\n# ${section}\n`;
+                changelog += sections[section].join("\n");
+            }
+            for (const pr of prs.data.items) {
+                await github.rest.issues.addLabels({
+                    owner: context.payload.repository.owner.login,
+                    repo: context.payload.repository.name,
+                    issue_number: pr.number,
+                    labels: [prerelease ? "in-prerelease" : "released"]
+                });
+                if (!prerelease && pr.labels.find(label => label.name === "in-prerelease") !== undefined) {
+                    await github.rest.issues.removeLabel({
+                        owner: context.payload.repository.owner.login,
+                        repo: context.payload.repository.name,
+                        issue_number: pr.number,
+                        name: "in-prerelease"
+                    });
+                }
+            }
+            return changelog.trim();
+          result-encoding: string
+      - name: Setup Git
+        # language=bash
         run: |
-          echo "MINECRAFT_VERSION=$(grep "minecraft_version" gradle.properties | cut -d'=' -f2)" >> $GITHUB_ENV
-          
-          MOD_GAME_VERSION=$(grep "mod_version" gradle.properties | cut -d'=' -f2)
-          echo "MOD_GAME_VERSION=${MOD_GAME_VERSION}" >> $GITHUB_ENV
-          
-          MOD_VERSION=$(echo ${MOD_GAME_VERSION} | cut -d'+' -f1)
-          echo "MOD_VERSION=${MOD_VERSION}" >> $GITHUB_ENV
-          
-          GIT_VERSION_TAG=v$(echo ${MOD_GAME_VERSION} | sed 's/+/-/')
-          echo "GIT_VERSION_TAG=${GIT_VERSION_TAG}" >> $GITHUB_ENV
-          
-          echo "release-tag=${GIT_VERSION_TAG}" >> $GITHUB_OUTPUT
-
-      # Create temp changelog files, add content from input and documentation files
-      #
-      # Extract changelog from changelog.md, match content between two "*Release*" lines
-      # Extract mod compatibility info from mod-compatibility.md, match content between two "Compatibility For" lines
-      # Remove "Development Chores" from extracted changelog
-      # Replace "###" with "##" in changelog for higher head level
-      #
-      # Release message for GitHub release: note + changelog + mod compatibility
-      # Release message for modrinth, curseforge: note + changelog
-      - name: Prepare Release Messages
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+      - name: Pull Weblate Changes
+        continue-on-error: true
+        # language=bash
         run: |
-          touch .changelog_temp
-          if [ "${{ inputs.note }}" != '' ] ; then printf "${{ inputs.note }}" > .changelog_temp ; fi
-          awk '/Release v${{ env.MOD_VERSION }}/{flag=1;next}/----/{next}/Release/{if (flag==1)exit}flag' \
-            ${{ env.CHANGELOG_FILE_PATH }} >> .changelog_temp
-          sed -i '/^### Development Chores.*$/,/\Z/d' .changelog_temp
-          sed -i 's/^###/##/' .changelog_temp
-          
-          cp .changelog_temp ${{ env.CHANGELOG_TEMP_GITHUB }}
-          printf "## Mod Version Compatibility" >> ${{ env.CHANGELOG_TEMP_GITHUB }}
-          awk '/Compatibility For ${{ env.MINECRAFT_VERSION }}/{flag=1;next}/----/{next}/Compatibility For/{if (flag==1)exit}flag' \
-            ${{ env.MOD_COMPATIBILITY_INFO_FILE_PATH }} \
-            >> ${{ env.CHANGELOG_TEMP_GITHUB }}
-          
-          sed -i 's@/doc@https://github.com/khanshoaib3/minecraft-access/blob/1.21/doc@g' .changelog_temp 
-          cp .changelog_temp ${{ env.CHANGELOG_TEMP_PLATFORM }}
-          printf "For additional information about this release, please check [this GitHub release page](https://github.com/khanshoaib3/minecraft-access/releases/tag/${{ env.GIT_VERSION_TAG }})." >> ${{ env.CHANGELOG_TEMP_PLATFORM }}
-
-      # Action ref: https://github.com/Kir-Antipov/mc-publish
-      - name: Create Github Release
-        if: ${{ inputs.pre-release }}
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          github-tag: ${{ env.GIT_VERSION_TAG }}
-          github-generate-changelog: true
-          github-prerelease: ${{ inputs.pre-release }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          files: ${{ env.UPLOAD_PATH }}/*.jar
-          name: Release v${{ env.MOD_VERSION }} for ${{ env.MINECRAFT_VERSION }} [Fabric/NeoForge]
-          changelog-file: ${{ env.CHANGELOG_TEMP_GITHUB }}
-
-      # For example: [Fabric 1.20.4] v1.5.2
-      #
-      # "we do not recommend manually featuring any version"
-      # ref: https://support.modrinth.com/en/articles/8793360-version-auto-featuring
-      - name: Publish Fabric Version to Modrinth and CurseForge
-        if: ${{ !inputs.pre-release }}
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          modrinth-id: ${{ env.MODRINTH_ID }}
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          modrinth-featured: false
-          curseforge-id: ${{ env.CURSEFORGE_ID }}
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          name: "[Fabric ${{ env.MINECRAFT_VERSION }}] v${{ env.MOD_VERSION }}"
-          changelog-file: ${{ env.CHANGELOG_TEMP_PLATFORM }}
-          files: ${{ env.UPLOAD_PATH }}/*-fabric.jar
-          version: ${{ env.MOD_GAME_VERSION }}-fabric
-          loaders: fabric
-          game-versions: ${{ env.MINECRAFT_VERSION }}
-          java: ${{ env.JAVA_VERSION }}
-          retry-attempts: 2
-          retry-delay: 60000
-
-      - name: Publish NeoForge Version to Modrinth and CurseForge
-        if: ${{ !inputs.pre-release }}
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          modrinth-id: ${{ env.MODRINTH_ID }}
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          curseforge-id: ${{ env.CURSEFORGE_ID }}
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          name: "[NeoForge ${{ env.MINECRAFT_VERSION }}] v${{ env.MOD_VERSION }}"
-          modrinth-featured: false
-          changelog-file: ${{ env.CHANGELOG_TEMP_PLATFORM }}
-          files: ${{ env.UPLOAD_PATH }}/*-neoforge.jar
-          version: ${{ env.MOD_GAME_VERSION }}-neoforge
-          loaders: neoforge
-          game-versions: ${{ env.MINECRAFT_VERSION }}
-          java: ${{ env.JAVA_VERSION }}
-          retry-attempts: 2
-          retry-delay: 60000
-
-  # I want to keep current style of release message - "What's Changed" is wrapped and hidden
-  # And this workflow will also change existing "pre-release" release's status for formal-release publish
-  post-github-release:
-    name: Post GitHub Release Process
-    needs: publish
+          git pull https://hosted.weblate.org/git/minecraft-access/mod/
+      - name: Update Changelog
+        if: !contains(inputs.version, '-')
+        env:
+          CHANGELOG: ${{ steps.changelog.outputs.result }}
+        # language=bash
+        run: |
+          changelog=${CHANGELOG//$'\n'/\\n}
+          changelog=${changelog//# /### }
+          sed "/<!-- INSERT CHANGELOG HERE -->/a\\\\n## Release v${{ inputs.version }} ($(date +%Y-%m))\n${changelog}" -i ./docs/changelog.md
+          git add ./docs/changelog.md
+          git commit -m $'Updated changelog for v${{ inputs.version }}\n\nCo-authored-by: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>'
+      - name: Tag
+        # language=bash
+        run: |
+          git tag "v${{ inputs.version }}" -m $'${{ steps.changelog.outputs.result }}\n\nReleased-by: @${{ github.actor }}' --cleanup=whitespace
+      - name: Push Changes
+        # language=bash
+        run: |
+          git push --follow-tags
+  release:
+    name: Release (${{ matrix.loader.name }})
+    needs:
+      - prepare
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        loader:
+          - name: Fabric
+            slug: fabric
+          - name: NeoForge
+            slug: neoforge
     permissions:
+      id-token: write
       contents: write
-    uses: ./.github/workflows/post_github_release.yml
-    with:
-      release-tag: ${{ needs.publish.outputs.release-tag }}
-      pre-release: ${{ inputs.pre-release }}
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v${{ inputs.version }}
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ vars.JAVA_VERSION }}
+          distribution: ${{ vars.JAVA_DISTRIBUTION }}
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          build-scan-publish: true
+          build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
+          build-scan-terms-of-use-agree: "yes"
+      - name: Build
+        # language=bash
+        run: ./gradlew clean :${{ matrix.loader.slug }}:build -x test
+      - uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          # FIXME
+#          modrinth-id: ${{ vars.MODRINTH_ID }}
+#          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+#          curseforge-id: ${{ vars.CURSEFORGE_ID }}
+#          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          github-tag: v${{ inputs.version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-name: Minecraft Access v${{ inputs.version }}
+          files: ./${{ matrix.loader.slug }}/build/libs/*+${{ matrix.loader.slug }}.jar
+          name: Minecraft Access v${{ inputs.version }} for ${{ matrix.loader.name }}
+          version: ${{ inputs.version }}+${{ matrix.loader.slug }}
+          changelog: ${{ needs.prepare.outputs.changelog }}
+      - uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: ./${{ matrix.loader.slug }}/build/libs/*+${{ matrix.loader.slug }}.jar
