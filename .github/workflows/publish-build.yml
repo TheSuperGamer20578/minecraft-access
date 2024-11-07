@@ -1,0 +1,89 @@
+name: Publish Build
+on:
+  workflow_call:
+    inputs:
+      title:
+        type: string
+        required: true
+      tag:
+        type: string
+        required: true
+      colour:
+        type: number
+        required: true
+      fields:
+        type: string
+        required: true
+      links:
+        type: string
+        required: true
+      description:
+        type: string
+        required: false
+    secrets:
+      SNAPSHOT_WEBHOOK:
+        required: true
+
+jobs:
+  publish:
+    name: Publish Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+      - name: Send to Discord
+        env:
+          TITLE: ${{ inputs.title }}
+          TAG: ${{ inputs.tag }}
+          COLOUR: ${{ inputs.colour }}
+          FIELDS: ${{ inputs.fields }}
+          LINKS: ${{ inputs.links }}
+        # language=bash
+        run: |
+          jq -nc \
+            --arg title "$TITLE" \
+            --arg notification_role "${{ vars.SNAPSHOT_NOTIFICATION_ROLE }}" \
+            --arg tag "$TAG" \
+            --arg colour "$COLOUR" \
+            --arg author "${{ github.actor }}" \
+            --arg owner "${{ github.repository_owner }}" \
+            --arg description "$DESCRIPTION" \
+            --argjson fields "$FIELDS" \
+            --argjson links "$LINKS" \
+            '{
+              "thread_name": $title,
+              "content": "<@&\($notification_role)>",
+              "applied_tags": [$tag],
+              "embeds": [
+                {
+                  "title": $title,
+                  "color": $colour,
+                  "fields": $fields,
+                  "description": $description,
+                  "author": {
+                    "name": $author,
+                    "url": "https://github.com/\($author)",
+                    "icon_url": "https://github.com/\($author).png"
+                  },
+                  "thumbnail": {
+                    "url": "https://github.com/\($owner).png"
+                  }
+                }
+              ],
+              "components": [
+                {
+                  "type": 1,
+                  "components": $links | map(
+                    {
+                      "type": 2,
+                      "style": 5,
+                      "label": .label,
+                      "url": .url
+                    }
+                  )
+                }
+              ]
+            }' \
+          | curl --fail-with-body -X POST ${{ secrets.SNAPSHOT_WEBHOOK }} \
+            -F "payload_json=<-;type=application/json" \
+            -F files[0]=@$(ls -1 ./minecraft-access/*+fabric.jar | head -n 1) \
+            -F files[1]=@$(ls -1 ./minecraft-access/*+neoforge.jar | head -n 1)

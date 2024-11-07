@@ -1,0 +1,65 @@
+name: Publish PR Build
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+
+jobs:
+  build:
+    name: Build
+    if: >
+      github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'bedrock-breakers')
+      || github.event.action == 'labeled' && github.event.label.name == 'bedrock-breakers'
+    uses: ./.github/workflows/build.yml
+    with:
+      ref: ${{ github.event.pull_request.merge_commit_sha || github.event.pull_request.head.sha }}
+  publish:
+    name: Publish Build
+    needs:
+      - build
+    uses: ./.github/workflows/publish-build.yml
+    secrets: inherit
+    with:
+      title: "Pull Request #${{ github.event.pull_request.number }} Snapshot #${{ github.run_number }}"
+      tag: "1319493660718530631"
+      colour: 15136066
+      # language=json
+      fields: |
+        [
+          {
+            "name": "Pull Request",
+            "value": "[**#${{ github.event.pull_request.number }}:**](${{ github.event.pull_request.html_url }}) ${{ github.event.pull_request.title }}",
+            "inline": false
+          },
+          {
+            "name": "Branch",
+            "value": "${{ github.ref_name }}",
+            "inline": true
+          },
+          {
+            "name": "Run Number",
+            "value": "#${{ github.run_number }}",
+            "inline": true
+          },
+          {
+            "name": "Description",
+            "value": "```\n${{ join(github.event.commits.*.message, '\n```\n```\n') }}\n```",
+            "inline": false
+          }
+        ]
+      # language=json
+      links: |
+        [
+          {
+            "label": "View Pull Request",
+            "url": "${{ github.event.pull_request.html_url }}"
+          },
+          {
+            "label": "Compare Changes",
+            "url": "${{ github.event.compare }}"
+          }
+        ]
+      description: ${{ github.event.pull_request.description }}
