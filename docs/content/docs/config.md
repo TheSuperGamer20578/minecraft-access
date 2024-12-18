@@ -28,7 +28,7 @@ This config is under `Other Configurations` section in the config file and confi
 |-------------------------|---------------|--------------------------------------------------------------------------|
 | Enable Facing Direction | true          | Whether to automatically speak the current direction as the camera moves |
 
-See also: [Feature Description]({{% relref "/features#camera-controls" %}}), [keybindings]({{% relref "/keybindings#camera-controls" %}})
+See also: [Feature Description]({{% relref "/docs/features#camera-controls" %}}), [keybindings]({{% relref "/docs/keybindings#camera-controls" %}})
 
 ## Mouse Simulation
 
@@ -37,7 +37,7 @@ See also: [Feature Description]({{% relref "/features#camera-controls" %}}), [ke
 | Enabled                        | true          | Whether to enable this feature                      |
 | Scroll Delay (in milliseconds) | 150           | Cooldown between two mouse wheel scroll simulations |
 
-See also: [Feature Description]({{% relref "/features#mouse-simulation" %}}), [keybindings]({{% relref "/keybindings#mouse-simulation" %}})
+See also: [Feature Description]({{% relref "/docs/features#mouse-simulation" %}}), [keybindings]({{% relref "/docs/keybindings#mouse-simulation" %}})
 
 ## Read Crosshair
 
@@ -51,7 +51,7 @@ See also: [Feature Description]({{% relref "/features#mouse-simulation" %}}), [k
 Config `Disable Speaking Consecutive Blocks With Same Name` option can be useful
 when you don't want to hear repetitive speaking of a large area with the same block type.
 
-See also: [Feature Description]({{% relref "/features#read-crosshair" %}})
+See also: [Feature Description]({{% relref "/docs/features#read-crosshair" %}})
 
 ### Relative Position Sound Cue
 
@@ -61,7 +61,7 @@ See also: [Feature Description]({{% relref "/features#read-crosshair" %}})
 | Min Sound Volume | 0.25          | Min volume of the sound cue    |
 | Max Sound Volume | 0.4           | Max volume of the sound cue    |
 
-See also: [Feature Description]({{% relref "/features#relative-position-sound-cue" %}})
+See also: [Feature Description]({{% relref "/docs/features#relative-position-sound-cue" %}})
 
 ### Partial Speaking
 
@@ -82,7 +82,7 @@ the `Block of Diamond` is written in `diamond_block`,
 so please check the correct values in [this wiki link](https://minecraft.wiki/w/Java_Edition_data_values#Blocks)
 (expand to show the list by clicking `Blocks[show]` then `Item form's ID[show]`).
 
-See also: [Feature Description]({{% relref "/features#partial-speaking" %}})
+See also: [Feature Description]({{% relref "/docs/features#partial-speaking" %}})
 
 ## Inventory Controls
 
@@ -98,12 +98,12 @@ See also: [Feature Description]({{% relref "/features#partial-speaking" %}})
 Most recipes [require](https://minecraft.wiki/w/Crafting) their ingredients to be arranged in a specific way on the crafting grid (a.k.a. our crafting input group).
 That's how `Row and Column Format in Crafting Input Slots` config can help you, you'll hear something like `1x2 Empty Slot` which represent you're locating at row one and column two slot inside the crafting input group, and it contains nothing.
 
-See also: [Feature Description]({{% relref "/features#inventory-controls" %}}), [keybindings]({{% relref "/keybindings#inventory-controls" %}})
+See also: [Feature Description]({{% relref "/docs/features#inventory-controls" %}}), [keybindings]({{% relref "/docs/keybindings#inventory-controls" %}})
 
 ## Point of Interest
 
-See also: [Feature Description]({{% relref "/features#points-of-interest" %}}),
-[keybindings]({{% relref "/keybindings#point-of-interest" %}})
+See also: [Feature Description]({{% relref "/docs/features#points-of-interest" %}}),
+[keybindings]({{% relref "/docs/keybindings#point-of-interest" %}})
 
 ### Blocks
 
@@ -158,7 +158,7 @@ These configs are under `Other Configurations` section in the config file and co
 | Enable Position Narrator | true               | Whether to enable this feature                                                                       |
 | Position Narrator Format | `{x}x, {y}y, {z}z` | The speaking format of the position, `{x}`, `{y}`, `{z}` represent the corresponding axis's position |
 
-See also: [Feature Description]({{% relref "/features#position-narrator" %}}), [keybindings]({{% relref "/keybindings#position-narrator" %}})
+See also: [Feature Description]({{% relref "/docs/features#position-narrator" %}}), [keybindings]({{% relref "/docs/keybindings#position-narrator" %}})
 
 ## Player Status
 
@@ -168,7 +168,7 @@ This config is under `Other Configurations` section in the config file and confi
 |------------------------|---------------|--------------------------------|
 | Enable PlayerStatus | true          | Whether to enable this feature |
 
-See also: [Feature Description]({{% relref "/features#player-status" %}}), [keybindings]({{% relref "/keybindings#player-status" %}})
+See also: [Feature Description]({{% relref "/docs/features#player-status" %}}), [keybindings]({{% relref "/docs/keybindings#player-status" %}})
 
 ## Player Warnings
 
@@ -181,7 +181,7 @@ See also: [Feature Description]({{% relref "/features#player-status" %}}), [keyb
 | Hunger Threshold        | 3             | The threshold for hunger/food                               |
 | Air Threshold           | 3             | The threshold for air when you're submerged in water        |
 
-See also: [Feature Description]({{% relref "/features#player-warnings" %}})
+See also: [Feature Description]({{% relref "/docs/features#player-warnings" %}})
 
 ## Fall Detector
 
@@ -194,7 +194,7 @@ See also: [Feature Description]({{% relref "/features#player-warnings" %}})
 | Sound Volume            | 0.25          | Volume of the sound cue             |
 | Delay (in milliseconds) | 2500          | Execute at set intervals            |
 
-See also: [Feature Description]({{% relref "/features#fall-detector" %}})
+See also: [Feature Description]({{% relref "/docs/features#fall-detector" %}})
 
 ## Access Menu
 
@@ -202,7 +202,7 @@ See also: [Feature Description]({{% relref "/features#fall-detector" %}})
 |---------------|---------------|--------------------------------|
 | Enabled       | true          | Whether to enable this feature |
 
-See also: [Feature Description]({{% relref "/features#access-menu" %}}), [keybindings]({{% relref "/keybindings#access-menu" %}})
+See also: [Feature Description]({{% relref "/docs/features#access-menu" %}}), [keybindings]({{% relref "/docs/keybindings#access-menu" %}})
 
 ### Fluid Detector
 
@@ -215,8 +215,8 @@ See also: [Feature Description]({{% relref "/features#access-menu" %}}), [keybin
 
 | Configuration                          | Default Value | Description                                                                                                                                                               |
 |----------------------------------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Enable Biome Indicator                 | true          | Whether to enable [`Biome Indicator`]({{% relref "/features#biome-indicator" %}}) feature                                                                                 |
-| Enable XP Indicator                    | true          | Whether to enable [`XP Indicator`]({{% relref "/features#xp-indicator" %}}) feature                                                                                       |
+| Enable Biome Indicator                 | true          | Whether to enable [`Biome Indicator`]({{% relref "/docs/features#biome-indicator" %}}) feature                                                                                 |
+| Enable XP Indicator                    | true          | Whether to enable [`XP Indicator`]({{% relref "/docs/features#xp-indicator" %}}) feature                                                                                       |
 | Command Suggestion Narrator Format     | `%dx%d %s`    | The speaking format of the command suggestion, two `%d` represent the order of focused suggestion and total number of suggestions, `%s` represents the suggestion content |
 | Use 12 Hour Time Format                | false         | Whether to use 12 hour time format when speaking the time                                                                                                                 | 
 | Speak Action Bar Messages              | true          | Whether to speak the messages updated in [action bar](https://minecraft.wiki/w/Commands/title), useful when you're in modded multiplayer servers                          |
@@ -227,4 +227,4 @@ See also: [Feature Description]({{% relref "/features#access-menu" %}}), [keybin
 | Debug Mode                             | true          | Developer config, whether to print debug messages into log                                                                                                                |
 | Multiple Click Speed (in milliseconds) | 750           | The maximum time interval between two keystrokes in multiple click operations like `double-click`                                                                         |
 
-See also: [Feature Description]({{% relref "/features#other-small-features" %}})
+See also: [Feature Description]({{% relref "/docs/features#other-small-features" %}})

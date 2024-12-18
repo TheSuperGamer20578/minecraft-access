@@ -55,7 +55,7 @@ You can't achieve this if the server doesn’t belong to you.
 ## Why is nobody answering my questions in the Discord?
 
 Sorry for the inconvenience. Here are some self-help materials.
-If you have any questions about installing, please read the [set-up guide]({{% relref "/setup/basic" %}}).
+If you have any questions about installing, please read the [set-up guide]({{% relref "/docs/setup/basic" %}}).
 If you have any questions about original game functions, please search on the [wiki](https://minecraft.wiki/w/Special:Search?scope=internal) or just google it.
 If you want to learn to play the game,
 there are some detailed text tutorials on the [wiki](https://minecraft.wiki/w/Tutorials).
@@ -76,7 +76,7 @@ Yes, it has been uploaded to Modrinth as [Minecraft Access](https://modrinth.com
 
 ## Does this mod support X language?
 
-See the [I18N Fallback Mechanism]({{% relref "/features#i18n-fallback-mechanism" %}}) feature.
+See the [I18N Fallback Mechanism]({{% relref "/docs/features#i18n-fallback-mechanism" %}}) feature.
 
 ## How can I contribute to I18N?
 
@@ -88,7 +88,7 @@ Choose the section that fits your progress:
 
 ### Haven't run the game yet
 
-I assume you have taken a look at the [setup guide]({{% relref "/setup/basic" %}}).
+I assume you have taken a look at the [setup guide]({{% relref "/docs/setup/basic" %}}).
 
 If you’re on a path that the setup guide doesn't mention
 (for example, you're not purchasing the game from the official site),
@@ -109,7 +109,7 @@ Great!
 Believe it or not, this is easier to solve than `abnormally running`,
 as the game crashed because it KNEW something was wrong, better than knowing nothing.
 If the crash pop up dialog says something about `mod incompatibility`,
-please refer to [this section]({{% relref "/setup/basic#update-the-game-and-mods" %}}) in the basic setup guide.
+please refer to [this section]({{% relref "/docs/setup/basic#update-the-game-and-mods" %}}) in the basic setup guide.
 
 If you’re using Fabric, there will be crash report files under the `crash-reports` folder in your `.minecraft` folder,
 developers need the latest `crash-...` file.

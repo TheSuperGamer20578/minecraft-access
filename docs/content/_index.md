@@ -12,7 +12,7 @@ This mod supports:
 * Game version `1.21`, `1.20.6`, `1.20.4`, `1.20.1`, `1.19.3`
 * On [Fabric](https://fabricmc.net/use/installer/) and [NeoForge](https://neoforged.net) mod loaders
 * On Windows and Linux operating systems ([Help us port the mod to macOS](https://github.com/khanshoaib3/minecraft-access/issues/22))
-* Works despite the language setting of the game (though the mod-specific narration will [fall back to English]({{% relref "/features#i18n-fallback-mechanism" %}}) if the mod does not support the language yet)
+* Works despite the language setting of the game (though the mod-specific narration will [fall back to English]({{% relref "/docs/features#i18n-fallback-mechanism" %}}) if the mod does not support the language yet)
 
 Each version of this mod will be pre-released on [GitHub](https://github.com/khanshoaib3/minecraft-access/releases) and announced in the [Playability Discord server](https://discord.gg/yQjjsDqWQX) first as a beta testing stage, after one week of feedback collection, the version will be released on [Modrinth](https://modrinth.com/mod/minecraft-access/versions) and [CurseForge](https://legacy.curseforge.com/minecraft/mc-mods/blind-accessibility/files).
 

@@ -41,7 +41,7 @@ Sounds can be played by pressing the play button.
 Most sounds are taken from Minecraft and are property of Mojang,
 the [Minecraft Usage Guidelines] apply.
 
-[feature]: {{% relref "/features" %}}
+[feature]: {{% relref "/docs/features" %}}
 [Door]: https://minecraft.wiki/w/Door
 [Ladder]: https://minecraft.wiki/w/Ladder
 [Crafting Table]: https://minecraft.wiki/w/Crafting_table
