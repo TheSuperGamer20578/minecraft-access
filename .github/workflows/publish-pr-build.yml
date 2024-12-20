@@ -23,7 +23,7 @@ jobs:
     uses: ./.github/workflows/publish-build.yml
     secrets: inherit
     with:
-      title: "Pull Request #${{ github.event.number }} Snapshot #${{ github.run_number }}"
+      title: "Pull Request #${{ github.event.number }} Snapshot #${{ github.run_number }} [${{ github.event.pull_request.head.user }}:${{ github.event.pull_request.head.ref }}]"
       tag: "1319493660718530631"
       colour: 15136066
       # language=json
@@ -35,8 +35,12 @@ jobs:
             "inline": false
           },
           {
+            "name": "Author",
+            "value": "${{ github.event.pull_request.user.name }} [@${{ github.event.pull_request.user.login }}](${{ github.event.pull_request.user.html_url }})"
+          },
+          {
             "name": "Branch",
-            "value": "${{ github.ref_name }}",
+            "value": "${{ github.event.pull_request.head.user }}:${{ github.event.pull_request.head.ref }}",
             "inline": true
           },
           {
