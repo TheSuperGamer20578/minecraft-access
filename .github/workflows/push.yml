@@ -51,7 +51,7 @@ jobs:
             "inline": true
           },
           {
-            "name": "Run Number",
+            "name": "Build Number",
             "value": "#${{ github.run_number }}",
             "inline": true
           },
