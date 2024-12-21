@@ -145,7 +145,7 @@ public class MainClass {
         FallDetector.getInstance().update();
 
         MouseKeySimulation.getInstance().update();
-
+try {} catch (Exception e) {}
         // TODO remove feature flag after complete
         // AreaMapMenu.getInstance().update();
     }
