@@ -75,10 +75,4 @@ allprojects {
     checkstyle {
         toolVersion = '10.21.0'
     }
-
-    tasks.withType(Checkstyle) {
-        reports {
-            xml.required = true
-        }
-    }
 }

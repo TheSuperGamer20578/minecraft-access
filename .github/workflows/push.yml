@@ -45,6 +45,8 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
       - uses: dbelyaev/action-checkstyle@v1
+        env:
+          REVIEWDOG_TOKEN: ${{ secrets.REVIEWDOG_TOKEN }}
         with:
           level: warning
           checkstyle_config: ./config/checkstyle/checkstyle.xml
