@@ -78,7 +78,7 @@ allprojects {
 
     tasks.withType(Checkstyle) {
         reports {
-            sarif.required = true
+            xml.required = true
         }
     }
 }

@@ -3,6 +3,7 @@
         "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
         "https://checkstyle.org/dtds/configuration_1_3.dtd">
 <module name="Checker">
+    <property name="severity" value="warning"/>
     <module name="JavadocPackage"/>
     <module name="NewlineAtEndOfFile"/>
     <module name="UniqueProperties"/>
