@@ -33,6 +33,35 @@ jobs:
       - name: Test
         # language=bash
         run: ./gradlew clean test
+  checkstyle:
+    name: Lint / Checkstyle
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          build-scan-publish: true
+          build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
+          build-scan-terms-of-use-agree: "yes"
+      - name: Lint
+        continue-on-error: true
+        # language=bash
+        run: |
+          ./gradlew clean checkstyleMain checkstyleTest
+          mv ./*/build/reports/checkstyle/*.sarif .
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: .
   publish:
     name: Publish Build
     needs:

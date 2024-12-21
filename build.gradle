@@ -48,6 +48,7 @@ allprojects {
     apply plugin: "java"
     apply plugin: "architectury-plugin"
     apply plugin: "maven-publish"
+    apply plugin: 'checkstyle'
 
     archivesBaseName = rootProject.archives_base_name
     group = rootProject.maven_group
@@ -69,5 +70,15 @@ allprojects {
 
     java {
         withSourcesJar()
+    }
+
+    checkstyle {
+        toolVersion = '10.21.0'
+    }
+
+    tasks.withType(Checkstyle) {
+        reports {
+            sarif.required = true
+        }
     }
 }
