@@ -33,6 +33,26 @@ jobs:
       - name: Test
         # language=bash
         run: ./gradlew clean test
+  checkstyle:
+    name: Lint / Checkstyle
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: dbelyaev/action-checkstyle@v1
+        env:
+          REVIEWDOG_TOKEN: ${{ secrets.REVIEWDOG_TOKEN }}
+        with:
+          level: warning
+          checkstyle_config: ./config/checkstyle/checkstyle.xml
+          reporter: ${{ github.event_name == 'push' && 'github-check' || 'github-pr-check' }}
+          filter_mode: ${{ github.event_name == 'push' && 'nofilter' || 'added' }}
+          fail_on_error: true
   publish:
     name: Publish Build
     needs:
