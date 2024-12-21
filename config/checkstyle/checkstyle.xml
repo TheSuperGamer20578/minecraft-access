@@ -20,6 +20,7 @@
         <module name="AvoidNestedBlocks"/>
         <module name="EmptyBlock"/>
         <module name="EmptyCatchBlock">
+            <property name="severity" value="error"/>
             <property name="commentFormat" value="^$"/>
             <property name="exceptionVariableName" value="^ignored$"/>
         </module>
