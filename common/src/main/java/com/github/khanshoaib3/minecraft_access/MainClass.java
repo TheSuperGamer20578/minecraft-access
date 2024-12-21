@@ -28,6 +28,14 @@ public class MainClass {
     public static XPIndicator xpIndicator = null;
     public static FacingDirection facingDirection = null;
     public static HealthNHunger healthNHunger = null;
+
+
+
+
+
+
+
+    
     public static PlayerWarnings playerWarnings = null;
     public static AccessMenu accessMenu = null;
     public static FluidDetector fluidDetector = null;
@@ -41,9 +49,7 @@ public class MainClass {
      */
     public static void init() {
         try {
-            _init();
-        } catch (Exception e) {
-            log.error("An error occurred while initializing Minecraft Access.", e);
+            _init();}catch(Exception e){log.error("An error occurred while initializing Minecraft Access.", e);
         }
     }
 
@@ -154,15 +160,22 @@ public class MainClass {
                 Configurator.setLevel("com.github.khanshoaib3.minecraft_access", Level.DEBUG);
             }
         } else if (log.isDebugEnabled()) {
+            
             Configurator.setLevel("com.github.khanshoaib3.minecraft_access", Level.INFO);
         }
     }
 
     public static ScreenReaderInterface getScreenReader() {
         return MainClass.screenReader;
+
+        
     } //TODO remove this
 
     public static void setScreenReader(ScreenReaderInterface screenReader) {
+
+
+        
+        
         MainClass.screenReader = screenReader;
     }
 
@@ -170,6 +183,8 @@ public class MainClass {
         MainClass.interrupt = interrupt;
         if (isNeoForge) {
             MinecraftClient.getInstance().getNarratorManager().narrate(text);
+
+            
             return;
         }
 
@@ -177,6 +192,8 @@ public class MainClass {
     }
 
     public static void speakWithNarratorIfNotEmpty(String text, boolean interrupt) {
+
+        
         if (Strings.isNotEmpty(text)) {
             speakWithNarrator(text, interrupt);
         }
