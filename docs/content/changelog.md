@@ -4,6 +4,15 @@ title: "Changelog"
 
 <!-- INSERT CHANGELOG HERE -->
 
+## Release v1.1.2 (2025-06)
+### Wow
+- Changeloggy stuffs
+- Changeloggy stuff from a PR
+
+### A changelog section, wow
+- A changelog item, amazing
+- another changelog item
+
 ## Release v1.10.0 (2025-05)
 ### New Features
 - Support navigating and narrating on the config menu of the [Cloth Config](https://shedaniel.gitbook.io/cloth-config) library, this provides support to the config menus of other mods that also use this library. (If you run into a mod's config menu that is built with Cloth that isn't accessible, report it as a bug)
