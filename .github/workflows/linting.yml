@@ -40,7 +40,7 @@ jobs:
           do
             if jq -e "keys != keys_unsorted" $f
             then
-              echo "::error file=$f,title=Translation File Sorting::Missorted translation file."
+              echo "::error file=$f,line=1,title=Translation File Sorting::Missorted translation file."
               result=1
             fi
           done
@@ -71,7 +71,7 @@ jobs:
           then
             for f in $(git diff --name-only --diff-filter=U)
             do
-                echo "::error file=$f,title=Weblate Mergeability::This file has merge conflicts with Weblate. "\
+                echo "::error file=$f,line=1,title=Weblate Mergeability::This file has merge conflicts with Weblate. "\
                     "Please run \`git pull https://hosted.weblate.org/git/minecraft-access/mod\` and resolve them."
             done
             exit 1
