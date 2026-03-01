@@ -83,6 +83,7 @@ import org.mcaccess.minecraftaccess.mixin.BaseSpawnerAccessor;
 import org.mcaccess.minecraftaccess.mixin.WolfAccessor;
 import org.mcaccess.minecraftaccess.utils.NarrationUtils;
 import org.mcaccess.minecraftaccess.utils.PlayerUtils;
+import org.mcaccess.minecraftaccess.utils.i18n.Translation;
 import org.mcaccess.minecraftaccess.utils.position.Orientation;
 
 @Slf4j
@@ -110,7 +111,9 @@ public class MinecraftAccess implements WorldNarrator {
         return switch (rayCast()) {
             case BlockHitResult blockHitResult -> {
                 String side = Config.getInstance().narrateCrosshair.narrateBlockFace
-                        ? I18n.get(String.format("minecraft_access.direction.%s", blockHitResult.getDirection().getName()))
+                        ? new Translation("minecraft_access.direction")
+                                .variant(blockHitResult.getDirection().getName())
+                                .getString()
                         : "";
                 yield narrateBlock(blockHitResult.getBlockPos(), side);
             }

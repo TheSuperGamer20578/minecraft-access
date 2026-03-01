@@ -24,6 +24,7 @@ import org.mcaccess.minecraftaccess.Config;
 import org.mcaccess.minecraftaccess.MainClass;
 import org.mcaccess.minecraftaccess.utils.KeyMappingCategories;
 import org.mcaccess.minecraftaccess.utils.events.ClientPlayingTick;
+import org.mcaccess.minecraftaccess.utils.i18n.Translation;
 
 public class NarrateHeldItem implements BalmClientModule {
     private String previousItemName = null;
@@ -78,7 +79,9 @@ public class NarrateHeldItem implements BalmClientModule {
         boolean slotChanged = !Objects.equals(selectedSlot, previousSelectedSlot);
 
         if (nameChanged || slotChanged) {
-            MainClass.narrate(I18n.get("minecraft_access.other.selected", itemNameWithCount), true);
+            new Translation("minecraft_access.other.selected")
+                    .variable("item").put(itemNameWithCount)
+                    .narrate(true);
         } else if (countChanged && Config.getInstance().features.narrateHeldItemsCountWhenChanged) {
             MainClass.narrate(String.valueOf(itemCount), true);
         }
@@ -107,15 +110,15 @@ public class NarrateHeldItem implements BalmClientModule {
         if (Minecraft.getInstance().player.isSpectator()) return;
 
         LocalPlayer player = Minecraft.getInstance().player;
-        String hand;
+        Translation.Vanilla hand;
         ItemStack heldItem;
 
         if (!hasAltDown) {
-            hand = I18n.get("options.mainHand");
+            hand = new Translation.Vanilla("options.mainHand");
             assert player != null;
             heldItem = player.getMainHandItem();
         } else {
-            hand = I18n.get("minecraft_access.other.offhand");
+            hand = new Translation.Vanilla("minecraft_access.other.offhand");
             assert player != null;
             heldItem = player.getOffhandItem();
         }
@@ -124,6 +127,6 @@ public class NarrateHeldItem implements BalmClientModule {
         int heldItemCount = heldItem.getCount();
         heldItemName = (heldItemCount != 1 && !heldItem.isEmpty()) ? heldItemCount + " " + heldItemName : heldItemName;
 
-        MainClass.narrate("%s: %s".formatted(hand, heldItemName), false);
+        MainClass.narrate("%s: %s".formatted(hand.getString(), heldItemName), false);
     }
 }

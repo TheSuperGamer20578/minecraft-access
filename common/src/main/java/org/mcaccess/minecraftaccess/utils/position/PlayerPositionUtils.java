@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 
 import org.mcaccess.minecraftaccess.utils.NarrationUtils;
+import org.mcaccess.minecraftaccess.utils.i18n.Translation;
 
 /**
  * Functions about getting player entity's position, facing direction etc.
@@ -79,7 +80,9 @@ public final class PlayerPositionUtils {
         return Orientation.ofHorizontal(angle);
     }
 
-    public static String getHorizontalFacingDirectionInWords() {
-        return I18n.get("minecraft_access.direction." + getHorizontalFacing());
+    public static Translation.Unmodifiable getHorizontalFacingDirectionInWords() {
+        return new Translation("minecraft_access.direction")
+                .variant(getHorizontalFacing().toString())
+                .unmodifiableView();
     }
 }
