@@ -19,6 +19,7 @@ dependencies {
     modImplementation libs.balmCommon
     modImplementation libs.clothConfigCommon
     implementation libs.tolk
+    compileOnly libs.mcdevAnnotations
 
     // Unit test dependencies
     testImplementation libs.junitJupiter
